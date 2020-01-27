@@ -33,7 +33,7 @@ public class Main {
 
         result.forEach(resultLine -> System.out.println(resultLine));
       } catch (Exception e) {
-
+        System.err.println("Falha ao buscar dados: " + e.getMessage());
       }
     } catch (Exception e) {
       System.err.println("Falha ao carregar o arquivo: " + e.getMessage());
