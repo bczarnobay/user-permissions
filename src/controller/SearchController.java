@@ -23,10 +23,10 @@ public class SearchController {
     }
 
     private void searchUserPermission(User user) {
-        user.getUserPermissions().forEach(permission -> searchPermission(permission));
+        user.getUserPermissions().forEach(permission -> searchPermissionFromDb(permission));
     }
 
-    private Object searchPermission(UserPermissions permission) {
+    private void searchPermissionFromDb(UserPermissions permission) {
         List<GroupType> groups = groupsController.getGroupsHash().get(permission.getIdCondominio());
 
         List<GroupType> dbGroups = groups.stream().filter(group -> group.getUserType().equals(permission.getUserType()))
@@ -34,26 +34,25 @@ public class SearchController {
 
         if (this.userTypePermissions.containsKey(permission.getIdCondominio())) {
             this.userTypePermissions.put(permission.getIdCondominio(),
-                    evaluatePermissions(userTypePermissions.get(permission.getIdCondominio()), dbGroups));
+                    comparePermissions(userTypePermissions.get(permission.getIdCondominio()), dbGroups));
         } else {
             this.userTypePermissions.put(permission.getIdCondominio(), dbGroups.remove(0).getPermissions());
         }
-        return groups;
     }
 
-    private List<Permissions> evaluatePermissions(List<Permissions> userPermissions,
+    private List<Permissions> comparePermissions(List<Permissions> userPermissions,
             List<GroupType> permissionsToBeInserted) {
         List<Permissions> newPermissions = new ArrayList<>();
         List<Permissions> permissionsToCompare = permissionsToBeInserted.remove(0).getPermissions();
 
-        newPermissions.add(comparePermissions(userPermissions, permissionsToCompare, "Usuarios"));
-        newPermissions.add(comparePermissions(userPermissions, permissionsToCompare, "Entregas"));
-        newPermissions.add(comparePermissions(userPermissions, permissionsToCompare, "Reservas"));
+        newPermissions.add(evaluatePermissions(userPermissions, permissionsToCompare, "Usuarios"));
+        newPermissions.add(evaluatePermissions(userPermissions, permissionsToCompare, "Entregas"));
+        newPermissions.add(evaluatePermissions(userPermissions, permissionsToCompare, "Reservas"));
 
         return newPermissions;
     }
 
-    private Permissions comparePermissions(List<Permissions> userPermissions, List<Permissions> permissionsToCompare,
+    private Permissions evaluatePermissions(List<Permissions> userPermissions, List<Permissions> permissionsToCompare,
             String function) {
         Permissions toBeUpdated = new Permissions();
         toBeUpdated.setFunction(function);
