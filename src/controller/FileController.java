@@ -25,15 +25,24 @@ public class FileController {
 	}
 
 	private Scanner loadPreStoredData() {
-		return loadData("resources\\preloaddb.txt");
+		try {
+			return loadData("resources\\preloaddb.txt");
+		}catch (Exception e) {
+			try {
+				return loadData("user-permissions\\resources\\preloaddb.txt");
+			} catch(Exception ex){
+				System.err.println("Falha ao carregar o arquivo: " + ex.getMessage());
+			}
+		}
+		return null;
 	}
 
 	private Scanner loadData(String input){
 		try {
             Scanner scanner = new Scanner(new BufferedReader(new FileReader(input)));
             return scanner;
-        } catch (IOException ex) {
-            System.err.println("Falha ao carregar o arquivo: " + ex.getMessage());
+        } catch (IOException e) {
+            System.err.println("Falha ao carregar o arquivo: " + e.getMessage());
         }
         return null;
 	}
